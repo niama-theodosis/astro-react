@@ -1,0 +1,20 @@
+---
+import PostsSection from "@/components/post/items-section.astro"
+import Layout from "@/layouts/layout.astro"
+import {fetchPostsByTag} from "@/lib/hashnode"
+
+// DATA ************************************************************************************************************************************
+const {tag} = Astro.params
+if (!tag) return Astro.redirect("/404")
+
+const {items, tagline, title} = await fetchPostsByTag(tag, 20)
+
+// CACHE ***********************************************************************************************************************************
+Astro.response.headers.set("cache-control", "public, max-age=0, must-revalidate")
+Astro.response.headers.set("netlify-cdn-cache-control", "s-maxage=31536000")
+Astro.response.headers.set("netlify-cache-tag", "posts")
+---
+
+<Layout>
+  <PostsSection {items} {tagline} title={title + " : " + tag} class="flex-1" />
+</Layout>
